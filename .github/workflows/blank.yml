@@ -1,16 +1,8 @@
-# This is a basic workflow to help you get started with Actions
+name: Build & Push Image
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -18,13 +10,28 @@ permissions:
   contents: read
 
 jobs:
-  access-secret:
+  build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - uses: google-github-actions/auth@v2
-      with:
-        workload_identity_provider: 'projects/727026638213/locations/global/workloadIdentityPools/accenture-lab-identitypool/providers/accenture-lab-identityprovider'
+      - name: Authenticate to Google Cloud (via WIF + SA impersonation)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/927944170120/locations/global/workloadIdentityPools/accenture-identity-pool/providers/accenture-lab-indentityprovider"
+          service_account: "cli-service-account-1@playground-s-11-88552fdb.iam.gserviceaccount.com"
+          token_format: "access_token"
 
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-docker.pkg.dev --quiet
 
+      - name: Build Docker image
+        run: |
+          docker build -t asia-docker.pkg.dev/playground-s-11-88552fdb/my-docker-repo/my-image:latest .
+
+      - name: Push image
+        run: |
+          docker push asia-docker.pkg.dev/playground-s-11-88552fdb/my-docker-repo/my-image:latest
