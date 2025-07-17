@@ -22,7 +22,6 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         workload_identity_provider: 'projects/727026638213/locations/global/workloadIdentityPools/accenture-lab-identitypool/providers/accenture-lab-identityprovider'
-        audience: 'https://sts.googleapis.com'
 
     - name: Set up gcloud CLI
       uses: google-github-actions/setup-gcloud@v1
@@ -44,9 +43,10 @@ jobs:
         gcloud config set project accenture-intern
 
     - name: Deploy to Cloud Run
-      run: |
-        gcloud run deploy static-frontend-service \
-          --image us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }} \
-          --platform managed \
-          --region us-central1 \
-          --allow-unauthenticated
+      id: deploy
+      uses: google-github-actions/deploy-cloudrun@v2
+      with:
+        service: 'static-frontend-service'  # Name of your Cloud Run service
+        image: 'us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }}'  # Docker image from Artifact Registry
+        region: 'us-central1'  # The region where the service will be deployed
+        allow_unauthenticated: true  # Optional: allows public access to the service
