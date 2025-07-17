@@ -46,9 +46,10 @@ jobs:
         gcloud config set project accenture-intern
 
     - name: Deploy to Cloud Run
-      id: deploy
-      uses: google-github-actions/deploy-cloudrun@v2
-      with:
-        service: 'static-frontend-service'
-        image: 'us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }}'
-        region: 'us-central1'
+      run: |
+        gcloud run deploy static-frontend-service \
+          --image us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --port=80
