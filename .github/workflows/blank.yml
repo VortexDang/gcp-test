@@ -49,7 +49,6 @@ jobs:
       id: deploy
       uses: google-github-actions/deploy-cloudrun@v2
       with:
-        service: 'static-frontend-service'  # Name of your Cloud Run service
-        image: 'us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }}'  # Docker image from Artifact Registry
-        region: 'us-central1'  # The region where the service will be deployed
-        allow_unauthenticated: true  # Optional: allows public access to the service
+        service: 'static-frontend-service'
+        image: 'us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }}'
+        region: 'us-central1'
