@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -37,3 +37,11 @@ jobs:
     - name: Push Docker image to Artifact Registry
       run: |
         docker push us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }}
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy static-frontend-service \
+          --image us-central1-docker.pkg.dev/accenture-intern/accenture-lab/static-site:${{ github.sha }} \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated
